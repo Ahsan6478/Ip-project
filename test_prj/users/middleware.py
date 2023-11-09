@@ -21,38 +21,39 @@ class IP_Middleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        print(request.path)
         if '/users/' in str(request.path) and "admin" not in str(request.path):
             client_ip = get_client_ip(request)
             
-            try:
+            # try:
                 # Fetching Data of User from IP
-                user = User.objects.get(ip = client_ip)
-                current_time = timezone.now()
-                
-                if user.status == "blocked":
-                    if user.unblock_time is not None: # Because unblock_time can be None
-                        if user.unblock_time < current_time:
-                            user.status = "unblock"
-                            user.req_count = 0 
-                            user.unblock_time = None
-                            user.save()
-                        else:
-                            return HttpResponseForbidden("<h1>BLOCKED !!!!!</h1>")
-                else:
-                    if user.req_count >= 5:
-                        user.status = "blocked"
-                        user.unblock_time = timezone.now() + timedelta(minutes = 10)       
-                        user.req_count += 1
+            # user = User.objects.get(ip = client_ip)
+            user, created = User.objects.get_or_create(name = f"user_{client_ip}",
+                                              ip = client_ip)
+            current_time = timezone.now()
+            
+            if user.status == "blocked":
+                if user.unblock_time is not None: # Because unblock_time can be None
+                    if user.unblock_time <= current_time:
+                        user.status = "unblock"
+                        user.req_count = 0 
+                        user.unblock_time = None
                         user.save()
                     else:
-                        user.req_count += 1
-                        user.save()     
-            except User.DoesNotExist:
+                        return HttpResponseForbidden("<h1>BLOCKED !!!!!</h1>")
+            else:
+                if user.req_count >= 5:
+                    user.status = "blocked"
+                    user.unblock_time = timezone.now() + timedelta(minutes = 10)       
+                    user.req_count += 1
+                    user.save()
+                else:
+                    user.req_count += 1
+                    user.save()     
+            # except User.DoesNotExist:
                 
-                # Creating User if not Found (First Time User)
-                user = User.objects.create(name = f"user_{client_ip}",
-                                    ip = client_ip)
+            #     # Creating User if not Found (First Time User)
+            #     user = User.objects.create(name = f"user_{client_ip}",
+            #                         ip = client_ip)
         
         response = self.get_response(request)
         return response
