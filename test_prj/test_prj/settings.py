@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
-    "users"
+    "users",
+    "payment"
 ]
 
 MIDDLEWARE = [
@@ -58,7 +59,7 @@ ROOT_URLCONF = "test_prj.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / 'templates'],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -128,3 +129,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # IPINFO_IP_SELECTOR = my_custom_ip_selector_implementation
+
+
+AUTHORIZE_NET_API_LOGIN_ID = '6u2P6cSK27'
+AUTHORIZE_NET_TRANSACTION_KEY = '978X3k7sY423wSJD'
+AUTHORIZE_NET_API_URL = 'https://apitest.authorize.net/xml/v1/request.api'

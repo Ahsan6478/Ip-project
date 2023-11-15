@@ -12,7 +12,7 @@ class TestBlockedUser(TestCase):
         
         for _ in range(10):
             response = self.client.get(url)
-            if _ in range(5):
+            if _ in range(6):
                 self.assertEqual(response.status_code, 200)
             
         self.assertEqual(response.status_code, 403)
